@@ -3,8 +3,7 @@
 // dependencies
 let AWS = require('aws-sdk');
 let async = require('async');
-let gm = require('gm')
-    .subClass({ imageMagick: true }); // Enable ImageMagick integration.
+let gm = require('gm');//.subClass({ imageMagick: true }); // Enable ImageMagick integration.
 let util = require('util');
 
 // get reference to S3 client 
@@ -19,9 +18,7 @@ exports.handler = function (event, context, callback) {
     // Read options from the event.
     console.log("Reading options from event:\n", util.inspect(event, { depth: 5 }));
     // Object key may have spaces or unicode non-ASCII characters.
-    let srcBucket = event.Records[0].s3.bucket.name;
     let srcKey = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, " "));
-    let dstBucket = srcBucket;
     let dstKey = "thumb-" + srcKey;
 
     // Infer the image type.
@@ -41,7 +38,7 @@ exports.handler = function (event, context, callback) {
         function download(next) {
             // Download the image from S3 into a buffer.
             s3.getObject({
-                'Bucket': srcBucket,
+                'Bucket': 'sigma-s3-thumb',
                 'Key': srcKey
             }, next);
         },
@@ -70,7 +67,7 @@ exports.handler = function (event, context, callback) {
             // Stream the transformed image to a different S3 bucket.
             s3.putObject({
                 "Body": data,
-                "Bucket": dstBucket,
+                "Bucket": 'sigma-s3-thumb',
                 "Key": dstKey,
                 "ContentType": contentType
             }, next);
@@ -78,10 +75,10 @@ exports.handler = function (event, context, callback) {
     ], function (err) {
         let msg;
         if (err) {
-            msg = `Unable to resize ${srcBucket}/${srcKey} and upload to ${dstBucket}/${dstKey} due to an error: ${err}`;
+            msg = `Unable to resize sigma-s3-thumb/${srcKey} and upload to sigma-s3-thumb/${dstKey} due to an error: ${err}`;
             console.error(msg);
         } else {
-            msg = `Successfully resized ${srcBucket}/${srcKey} and uploaded to ${dstBucket}/${dstKey}`;
+            msg = `Successfully resized sigma-s3-thumb/${srcKey} and uploaded to sigma-s3-thumb/${dstKey}`;
             console.log(msg);
         }
         callback(err, msg);
