@@ -30,7 +30,7 @@ exports.handler = function (event, context, callback) {
     }
     let imageType = typeMatch[1];
     if (imageType != "jpg" && imageType != "png") {
-        callback(`Unsupported image type: imageType`);
+        callback(`Unsupported image type: ${imageType}`);
         return;
     }
 
@@ -79,10 +79,10 @@ exports.handler = function (event, context, callback) {
     ], function (err) {
         let msg;
         if (err) {
-            msg = `Unable to resize sigma-s3-thumb/srcKey and upload to sigma-s3-thumb/dstKey due to an error: err`;
+            msg = `Unable to resize sigma-s3-thumb-input/${srcKey} and upload to sigma-s3-thumb-output/${dstKey} due to an error: ${err}`;
             console.error(msg);
         } else {
-            msg = `Successfully resized sigma-s3-thumb/srcKey and uploaded to sigma-s3-thumb/dstKey`;
+            msg = `Successfully resized sigma-s3-thumb-input/${srcKey} and uploaded to sigma-s3-thumb-output/${dstKey}`;
             console.log(msg);
         }
         callback(err, msg);
