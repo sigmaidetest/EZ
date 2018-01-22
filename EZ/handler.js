@@ -3,7 +3,7 @@
 // dependencies
 let AWS = require('aws-sdk');
 let async = require('async');
-let gm = require('gm');//.subClass({ imageMagick: true }); // Enable ImageMagick integration.
+let gm = require('gm').subClass({ imageMagick: true }); // Enable ImageMagick integration.
 let util = require('util');
 
 // get reference to S3 client 
