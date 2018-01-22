@@ -3,8 +3,9 @@
 // dependencies
 let AWS = require('aws-sdk');
 let async = require('async');
-let gm = require('gm').subClass({ imageMagick: true }); // Enable ImageMagick integration.
 let util = require('util');
+// Enable ImageMagick integration.
+let gm = require('gm').subClass({ imageMagick: true });
 
 // get reference to S3 client 
 const s3 = new AWS.S3();
@@ -29,7 +30,7 @@ exports.handler = function (event, context, callback) {
     }
     let imageType = typeMatch[1];
     if (imageType != "jpg" && imageType != "png") {
-        callback(`Unsupported image type: ${imageType}`);
+        callback(`Unsupported image type: imageType`);
         return;
     }
 
@@ -38,7 +39,7 @@ exports.handler = function (event, context, callback) {
         function download(next) {
             // Download the image from S3 into a buffer.
             s3.getObject({
-                'Bucket': 'sigma-s3-thumb',
+                'Bucket': "sigma-s3-thumb-input",
                 'Key': srcKey
             }, next);
         },
@@ -67,18 +68,21 @@ exports.handler = function (event, context, callback) {
             // Stream the transformed image to a different S3 bucket.
             s3.putObject({
                 "Body": data,
-                "Bucket": 'sigma-s3-thumb',
+                "Bucket": "sigma-s3-thumb-output",
                 "Key": dstKey,
-                "ContentType": contentType
+                "ACL": "public-read",
+                "Metadata": {
+                    "Content-Type": contentType
+                }
             }, next);
         }
     ], function (err) {
         let msg;
         if (err) {
-            msg = `Unable to resize sigma-s3-thumb/${srcKey} and upload to sigma-s3-thumb/${dstKey} due to an error: ${err}`;
+            msg = `Unable to resize sigma-s3-thumb/srcKey and upload to sigma-s3-thumb/dstKey due to an error: err`;
             console.error(msg);
         } else {
-            msg = `Successfully resized sigma-s3-thumb/${srcKey} and uploaded to sigma-s3-thumb/${dstKey}`;
+            msg = `Successfully resized sigma-s3-thumb/srcKey and uploaded to sigma-s3-thumb/dstKey`;
             console.log(msg);
         }
         callback(err, msg);
